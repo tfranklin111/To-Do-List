@@ -1,0 +1,97 @@
+import json
+
+
+tasks = []
+
+# Function for adding tasks
+def add_task():
+    task = input("Enter the task you want to add: ")
+    tasks.append({'Task': task, "completed": False})
+    print(f"Task {task} added!")
+
+
+# Function for viewing tasks
+def view_tasks():
+    if not tasks:
+        print("No tasks available!")
+    else:
+        for i, task in enumerate(tasks):
+            status = "completed" if task['completed'] else "not completed"
+            print(f"{i + 1}. {task['Task']} - {status}")
+
+
+# Function for marking tasks as completed
+def mark_task_completed():
+    task_number = int(input("Enter the task number to be marked complete: "))
+    if 0 <= task_number < len(tasks):
+        tasks[task_number]['completed'] = True
+        print("Task marked as completed.")
+    else:
+        print("Invalid task number!")
+
+
+# Function for deleting tasks
+def delete_task():
+    task_number = int(input("Enter the task number you want to delete: "))
+    task_to_delete = tasks[task_number]['Task']
+    confirm = input(f"Are you sure you want to delete: {task_to_delete}? (y/n): ")
+    if confirm.lower() == 'y':
+        tasks.pop(task_number)
+        print("Task deleted!")
+    elif confirm.lower() == 'n':
+        print("Task not deleted")
+    else:
+        print("Invalid task number!")
+
+
+# Function for saving tasks to a file
+def save_tasks():
+    with open('tasks.json', 'w') as file:
+        json.dump(tasks, file)
+    print("Tasks saved to tasks.json")
+
+
+# Function for loading tasks from a file
+def load_tasks():
+    global tasks
+    try:
+        with open('tasks.json', 'r') as file:
+            tasks = json.load(file)
+        print("Tasks loaded!")
+    except FileNotFoundError:
+        print("No saved tasks found.")
+
+
+# Function for displaying the menu and handling user input
+def menu():
+    while True:
+        print("\nTo Do List Menu:")
+        print("1. View Tasks")
+        print("2. Add Task")
+        print("3. Delete Task")
+        print("4. Mark Task as Completed")
+        print("5. Save Tasks")
+        print("6. Load Tasks")
+        print("7. Exit")
+
+        choice = input("Enter menu choice: ")
+        if choice == '1':
+            view_tasks()
+        elif choice == '2':
+            add_task()
+        elif choice == '3':
+            delete_task()
+        elif choice == '4':
+            mark_task_completed()
+        elif choice == '5':
+            save_tasks()
+        elif choice == '6':
+            load_tasks()
+        elif choice == '7':
+            print("Bye!")
+            break
+        else:
+            print("Invalid choice: Enter a number between 1 and 7.")
+
+
+menu()
