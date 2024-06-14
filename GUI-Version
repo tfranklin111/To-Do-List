@@ -1,0 +1,121 @@
+import json
+import curses
+
+tasks = []
+
+# Function for adding tasks
+def add_task(screen):
+    curses.echo()
+    screen.addstr("\nEnter the task: ")
+    task = screen.getstr().decode('utf-8')
+    tasks.append({'Task': task, 'completed':False})
+    screen.addstr('\nTask added! Press any key to continue...')
+    screen.getch()
+    curses.noecho()
+
+
+
+# Function for viewing tasks
+def view_tasks(screen):
+    screen.clear()
+    if not tasks:
+        screen.addstr("No tasks available.\n")
+    else:
+        for i, task in enumerate(tasks):
+            status = 'completed' if task ['completed'] else 'not completed'
+            screen.addstr(f"{i+1}. {task['Task']} - {status}\n")
+    screen.addstr("\nPress any key to continue...")
+    screen.getch()
+
+
+
+# Function for marking tasks as completed
+def mark_task_completed(screen):
+    curses.echo()
+    screen.addstr("Enter the task number to mark as completed: ")
+    task_number = int(screen.getstr().decode('utf-8'))
+    if 0 <= task_number < len(tasks):
+        tasks[task_number]['completed'] = True
+        screen.addstr("\nTask marked as completed! Press any key to continue...")
+    else:
+        screen.addstr("\nInvalid task number! Press any key to continue...")
+    screen.getch()
+    curses.noecho()
+
+
+# Function for deleting tasks
+def delete_task(screen):
+    curses.echo()
+    screen.addstr("Enter the task number to delete: ")
+    task_number = int(screen.getstr().decode('utf-8'))
+    if 0 <= task_number < len(tasks):
+        tasks.pop(task_number)
+        screen.addstr("\nTask deleted! Press any key to continue...")
+    else:
+        screen.addstr("\nInvalid task number! Press any key to continue...")
+    screen.getch()
+    curses.noecho()
+
+
+
+# Function for saving tasks to a file
+def save_tasks():
+    with open('tasks.json', 'w') as file:
+        json.dump(tasks, file)
+    print("Tasks saved to tasks.json")
+
+
+# Function for loading tasks from a file
+def load_tasks():
+    global tasks
+    try:
+        with open('tasks.json', 'r') as file:
+            tasks = json.load(file)
+        print("Tasks loaded!")
+    except FileNotFoundError:
+        print("No saved tasks found.")
+
+
+# Function for displaying the menu and handling user input
+def menu(screen):
+    while True:
+        screen.clear()
+        screen.addstr("To Do List Menu:\n")
+        screen.addstr("1. View Tasks\n")
+        screen.addstr("2. Add Task\n")
+        screen.addstr("3. Mark Task as Completed\n")
+        screen.addstr("4. Delete Task\n")
+        screen.addstr("5. Save Tasks\n")
+        screen.addstr("6. Load Tasks\n")
+        screen.addstr("7. Exit\n")
+        screen.addstr("Enter your choice: ")
+
+        choice = screen.getch()
+
+        if choice == ord('1'):
+            view_tasks(screen)
+        elif choice == ord('2'):
+            add_task(screen)
+        elif choice == ord('3'):
+            mark_task_completed(screen)
+        elif choice == ord('4'):
+            delete_task(screen)
+        elif choice == ord('5'):
+            save_tasks()
+            screen.addstr("\nTasks saved! Press any key to continue...")
+            screen.getch()
+        elif choice == ord('6'):
+            load_tasks()
+            screen.addstr("\nTasks loaded! Press any key to continue...")
+            screen.getch()
+        elif choice == ord('7'):
+            break
+        else:
+            screen.addstr("\nInvalid choice! Press any key to continue...")
+            screen.getch()
+
+
+def main():
+    curses.wrapper(menu)
+if __name__ == "__main__":
+    main()
